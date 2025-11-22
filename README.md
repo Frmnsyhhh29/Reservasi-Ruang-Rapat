@@ -90,7 +90,7 @@ selama pembuatan projek ini, saya menggunakan beberapa AI untuk membantu, yaitu 
 - chat gpt => untuk membantu menganalisis dan program backend
 - gemini => untuk membantu menganalisis dan program backend
 - claude => untuk membantu membuat tampilan projek/bagian frontend
-- Amazon => untuk membantu memperbaiki program yang sulit untuk di selesaikan
+- Amazon => untuk membantu memperbaiki program yang sulit untuk di untuk diperbaiki 
 
 Berikut adalah perintah/prompt yang saya gunakan untuk AI :
 
