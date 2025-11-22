@@ -1,59 +1,99 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+SISTEM RESERVASI RUANG RAPAT
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+1. Skema Database
+Berikut adalah tabel-table dari database yang sudah saya buat untuk sistem reservasi ruang rapat
 
-## About Laravel
+Tabel users :
+| Kolom      | Tipe Data | Keterangan           |
+| ---------- | --------- | -------------------- |
+| id         | int (PK)  | Primary Key          |
+| name       | varchar   | Nama user            |
+| email      | varchar   | Unique               |
+| password   | varchar   | Password terenkripsi |
+| created_at | timestamp | waktu dibuat         |
+| updated_at | timestamp | waktu update         |
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Tabel rooms :
+| Kolom      | Tipe Data | Keterangan      |
+| ---------- | --------- | --------------- |
+| id         | int (PK)  | Primary Key     |
+| name       | varchar   | Nama ruangan    |
+| capacity   | int       | Kapasitas       |
+| facilities | text      | Fasilitas ruang |
+| created_at | timestamp | waktu dibuat    |
+| updated_at | timestamp | waktu update    |
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Tabel reservations :
+| Kolom      | Tipe Data | Keterangan           |
+| ---------- | --------- | -------------------- |
+| id         | int (PK)  | Primary Key          |
+| user_id    | int (FK)  | Pemesan              |
+| room_id    | int (FK)  | Ruangan              |
+| date       | date      | Tanggal reservasi    |
+| start_time | time      | Jam mulai            |
+| end_time   | time      | Jam selesai          |
+| status     | enum      | confirmed / canceled |
+| created_at | timestamp | waktu dibuat         |
+| updated_at | timestamp | waktu update         |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Relasi antar tabel :
+- 1 User -> Banyak Reservasi (1:N)
+- 1 Room -> Banyak Reservasi (1:N)
 
-## Learning Laravel
+dan ada juga tabel bawaan dari laravel yaitu tabel :
+- cache
+- cache_locks
+- failed_jobs
+- jobs
+- job_batches
+- migrations
+- password_reset_tokens
+- sessions
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. Alur Logika Mencegah Konflik Jadwal
+Konflik jadwal terjadi jika waktu mulai atau waktu selesai reservasi baru tumpang tindih dengan reservasi yang sudah ada sebelumnya
 
-## Laravel Sponsors
+contoh :
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+| Reservasi Sistem | Reservasi Baru | Status          |
+| ---------------- | -------------- | --------------- |
+| 10:00–11:00      | 10:30–11:30    |   Bentrok       |
+| 10:00–11:00      | 09:00–10:00    |   Tidak bentrok |
+| 10:00–11:00      | 11:00–12:00    |   Tidak bentrok |
+| 10:00–11:00      | 09:30–10:30    |   Bentrok       |
 
-### Premium Partners
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Berikut adalah program untuk sistem mencegah konflik jadwal :
 
-## Contributing
+$conflict = Reservation::where('room_id', $request->room_id)
+->where(function ($query) use ($start, $end) {
+	$query->where('start_time', '<', $end)
+	->where('end_time', '>', $start);
+})
+->exists();
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+if ($conflict) {
+	return back()->withErrors(['msg' => 'Ruangan sudah dipesan pada waktu tersebut.'])->withInput();
+}
 
-## Code of Conduct
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+3. Dokumentasi cara prompt AI
+selama pembuatan projek ini, saya menggunakan beberapa AI untuk membantu, yaitu :
+- chat gpt => untuk membantu menganalisis dan program backend
+- gemini => untuk membantu menganalisis dan program backend
+- claude => untuk membantu membuat tampilan projek/bagian frontend
+- Amazon => untuk membantu memperbaiki program yang sulit untuk di selesaikan
 
-## Security Vulnerabilities
+Berikut adalah perintah/prompt yang saya gunakan untuk AI :
+chat gpt :
+dari data yang sudah saya berikan, tolong buatkan rancangan dasar untuk memulai projek tersebut. buatkan rancangannya dengan jelas,baik dan benar
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+gemini  :
+dari data yang sudah saya berikan, tolong analisis dan buatkan programnya dasar bagian backend nya
 
-## License
+claude :
+dari program yang sudah saya berikan, tolong buatkan tampilan halaman/frontend nya di laravel juga dan buatkan secara tersambung dengan backend nya
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+amazon :
+perbaiki error dan warning yang ada di bagian admin dikarenakan di bagian tersebut sulit untuk saya perbaiki
