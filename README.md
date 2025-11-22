@@ -13,6 +13,7 @@ Tabel users :
 | created_at | timestamp | waktu dibuat         |
 | updated_at | timestamp | waktu update         |
 
+
 Tabel rooms :
 | Kolom      | Tipe Data | Keterangan      |
 | ---------- | --------- | --------------- |
@@ -22,6 +23,7 @@ Tabel rooms :
 | facilities | text      | Fasilitas ruang |
 | created_at | timestamp | waktu dibuat    |
 | updated_at | timestamp | waktu update    |
+
 
 Tabel reservations :
 | Kolom      | Tipe Data | Keterangan           |
@@ -51,7 +53,9 @@ dan ada juga tabel bawaan dari laravel yaitu tabel :
 - sessions
 
 
+
 2. Alur Logika Mencegah Konflik Jadwal
+   
 Konflik jadwal terjadi jika waktu mulai atau waktu selesai reservasi baru tumpang tindih dengan reservasi yang sudah ada sebelumnya
 
 contoh :
@@ -76,6 +80,7 @@ $conflict = Reservation::where('room_id', $request->room_id)
 if ($conflict) {
 	return back()->withErrors(['msg' => 'Ruangan sudah dipesan pada waktu tersebut.'])->withInput();
 }
+
 
 
 3. Dokumentasi cara prompt AI
