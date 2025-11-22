@@ -92,6 +92,7 @@ selama pembuatan projek ini, saya menggunakan beberapa AI untuk membantu, yaitu 
 - Amazon => untuk membantu memperbaiki program yang sulit untuk di selesaikan
 
 Berikut adalah perintah/prompt yang saya gunakan untuk AI :
+
 chat gpt :
 dari data yang sudah saya berikan, tolong buatkan rancangan dasar untuk memulai projek tersebut. buatkan rancangannya dengan jelas,baik dan benar
 
