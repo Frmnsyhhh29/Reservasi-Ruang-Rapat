@@ -52,7 +52,7 @@ dan ada juga tabel bawaan dari laravel yaitu tabel :
 - password_reset_tokens
 - sessions
 
-
+---------------------------------------------------------------------------------------------------------------------------
 
 2. Alur Logika Mencegah Konflik Jadwal
    
@@ -81,9 +81,10 @@ if ($conflict) {
 	return back()->withErrors(['msg' => 'Ruangan sudah dipesan pada waktu tersebut.'])->withInput();
 }
 
-
+---------------------------------------------------------------------------------------------------------------------------
 
 3. Dokumentasi cara prompt AI
+   
 selama pembuatan projek ini, saya menggunakan beberapa AI untuk membantu, yaitu :
 - chat gpt => untuk membantu menganalisis dan program backend
 - gemini => untuk membantu menganalisis dan program backend
